@@ -1,0 +1,111 @@
+
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/kill?serverTimezone=UTC&userUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    #Spring Boot 默认是不注入这些属性值的，需要自己绑定
+    #druid 数据源专有配置
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+
+    #配置监控统计拦截的filters，stat:监控统计、log4j：日志记录、wall：防御sql注入
+    #如果允许时报错  java.lang.ClassNotFoundException: org.apache.log4j.Priority
+    #则导入 log4j 依赖即可，Maven 地址： https://mvnrepository.com/artifact/log4j/log4j
+    filters: stat,wall,log4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+
+  redis:
+    database: 0
+    port: 6379
+    host: localhost
+    password:
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        min-idle: 0
+        max-idle: 8
+    config:
+        host: redis://127.0.0.1
+
+  rabbitmq:
+    port: 5672
+    host: 127.0.0.1
+    username: guest
+    password: guest
+    listener:
+      simple:
+        concurrency: 10
+        max-concurrency: 20
+        prefetch: 5
+  mail:
+    host: smtp.qq.com
+    username: 723962386@qq.com
+    password: ycnydmgafwpobfej
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+mail:
+  sendfrom: 723962386@qq.com
+  killsuccesssubject: 商品抢购成功
+  kiilsuccesscontent: 您好，您已成功抢购到商品,请您在1个小时内完成订单的支付，超时将失效该订单哦！祝你生活愉快！
+
+mq:
+  env: test
+
+#秒杀成功异步发送邮件的消息模型
+  kill:
+    item:
+      success:
+        email:
+          queue: ${mq.env}.kill.item.success.email.queue
+          exchange: ${mq.env}.kill.item.success.email.exchange
+          routing.key: ${mq.env}.kill.item.success.email.routing.key
+
+#订单超时未支付自动失效-死信队列消息模型
+        kill:
+          dead:
+            queue: ${mq.env}.kill.item.success.kill.dead.queue
+            exchange: ${mq.env}.kill.item.success.kill.dead.exchange
+            routing.key: ${mq.env}.kill.item.success.kill.dead.routing.key
+            real.queue: ${mq.env}.kill.item.success.kill.dead.real.queue
+            prod.exchange: ${mq.env}.kill.item.success.kill.dead.prod.exchange
+            prod.routing.key: ${mq.env}.kill.item.success.kill.dead.prod.routing.key
+            expire: 10000
+#scheduler.expire.orders.time=30
+
+
+
+mybatis:
+  type-aliases-package: com.kill.entity
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8081
+
+redisson:
+  host: redis://127.0.0.1:6379
+shiro:
+  encrypt:
+    password: salt=11299c42bf954c0abb373efbae3f6b26

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:a="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.cookie.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.countdown.min.js}"></script>
+</head>
+<body>
+
+<script th:inline="javascript" type="text/javascript">
+    function execute() {
+        $.ajax({
+            type: "POST",
+            url: "execute",
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(getJsonData()),
+            dataType: "json",
+
+            success: function(res){
+                if (res==1) {
+                    //alert(res.msg);
+                    location.href="killSuccess"
+                }else{
+                    //alert(res.msg);
+                    location.href="error"
+                }
+            },
+            error: function (message) {
+                alert("提交数据失败！");
+                return;
+            }
+        });
+    }
+
+    function getJsonData() {
+        var killId=$("#killId").val();
+        /*var data = {
+            "killId":killId,
+            "userId":1
+        };*/
+        var data = {
+            "killId":killId,
+        };
+        return data;
+    }
+</script>
+    <input id="killId" th:value="${details.id}" type="hidden"/>
+    <h1 th:text="'商品名称：'+${details.name}"></h1>
+    <h3 th:text="'剩余数量：'+${details.total}"></h3>
+    <h3 th:text="'开始时间'+${#dates.format(details.startTime,'yyyy-MM-dd HH:mm:ss')}"></h3>
+    <h3 th:text="'结束时间'+${#dates.format(details.endTime,'yyyy-MM-dd HH:mm:ss')}"></h3>
+    <div th:switch="${details.canKill}">
+        <button th:case="1" th:onclick="|execute()|">抢购</button>
+        <a class="btn btn-info" th:case="0">该商品不在抢购时间或已被抢购完</a>
+    </div>
+</body>
+
+</html>

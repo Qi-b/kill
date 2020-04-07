@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:a="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+    <table>
+        <thead>
+        <tr>
+            <td style="font-size: 15px"><strong style="color: red">商品名称</strong></td>
+            <td style="font-size: 15px"><strong style="color: red">剩余数量</strong></td>
+            <td style="font-size: 15px"><strong style="color: red">开始时间</strong></td>
+            <td style="font-size: 15px"><strong style="color: red">结束时间</strong></td>
+            <td style="font-size: 15px"><strong style="color: red">查看详情</strong></td>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="lists:${info}">
+                <td th:text="${lists.name}"></td>
+                <td th:text="${lists.total}"></td>
+                <td th:text="${#dates.format(lists.startTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${#dates.format(lists.endTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:switch="${lists.canKill}">
+                    <a th:case="1" class="btn btn-info" th:href="@{'details/'+${lists.id}}">详情</a>
+                    <a th:case="0" class="btn btn-info" th:href="@{'details/'+${lists.id}}">该商品已售完</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
